@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.med.system.ManTick.Users.User;
+import com.med.system.ManTick.token.TokenRepository;
 
+import ch.qos.logback.core.subst.Token;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
+    private final TokenRepository tokenRepository;
     
     @Override
     protected void doFilterInternal(
@@ -51,7 +53,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            boolean isTokenValid = tokenRepository.findByToken(jwt)
+                .map(token -> !token.isExpired() && !token.isRevoked())
+                .orElse(false);
+
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
 
