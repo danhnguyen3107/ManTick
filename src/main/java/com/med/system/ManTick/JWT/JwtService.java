@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +19,17 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    // @Value("${jwt.secret}")
-    private static String SECRET_KEY = "4D28746E386459E4A3C5C341A1BC7D28746E386459E4A3C5C341A1BC7D2874";
+    @Value("${application.security.jwt.secret-key}")
+    private String SECRET_KEY;
+
+    @Value("${application.security.jwt.expiration}")
+    private long jwtExpiration;
+
+
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private long refreshExpiration;
+
+
 
     public String extractUsername(String token) {
         
@@ -36,22 +44,37 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(
-        Map<String, Object> extraClaims, 
-        UserDetails userDetails
-        ) {
-
-        
-        return Jwts.builder()
+      }
+    
+      public String generateToken(
+          Map<String, Object> extraClaims,
+          UserDetails userDetails
+      ) {
+        return buildToken(extraClaims, userDetails, jwtExpiration);
+      }
+    
+      public String generateRefreshToken(
+          UserDetails userDetails
+      ) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+      }
+    
+      private String buildToken(
+              Map<String, Object> extraClaims,
+              UserDetails userDetails,
+              long expiration
+      ) {
+        return Jwts
+                .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
+      }
+    
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

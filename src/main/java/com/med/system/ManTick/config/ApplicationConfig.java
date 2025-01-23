@@ -10,8 +10,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import com.med.system.ManTick.Users.UserRepository;
+import com.med.system.ManTick.auth.CustomAuthenticationFailureHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,5 +45,9 @@ public class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 }

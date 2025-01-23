@@ -1,6 +1,9 @@
-package com.med.system.ManTick.auth;
 
 
+package com.med.system.ManTick.Users.RequestResponse;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.med.system.ManTick.Users.Role;
 
 import lombok.AllArgsConstructor;
@@ -12,11 +15,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class UserResponse {
 
+    @JsonProperty("id")
+    private Integer id;
+
+    @JsonProperty("firstname")
     private String firstname;
+
+    @JsonProperty("lastname")
     private String lastname;
+
+    @JsonProperty("email")
     private String email;
-    private String password;
+
+    @JsonProperty("role")
     private Role role;
 }
