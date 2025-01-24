@@ -17,7 +17,7 @@ public class ManTickApplication {
 		SpringApplication.run(ManTickApplication.class, args);
 	}
 
-
+	
 	@Bean
 	public CommandLineRunner commandLineRunner(
 			AuthenticationService service

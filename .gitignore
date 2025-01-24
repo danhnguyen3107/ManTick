@@ -34,3 +34,5 @@ build/
 
 ### environment file ###
 .env
+
+./target/ManTick-0.0.1-SNAPSHOT*

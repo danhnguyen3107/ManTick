@@ -1,0 +1,44 @@
+version: "3"
+services:
+  mantick-app:
+    container_name: mantick_app
+    image: mantickapp
+    restart: always
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      DB_HOST: mysqldb
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_PORT: "3306"
+      DB_NAME: mantick_db
+      DB_DRIVER: "com.mysql.cj.jdbc.Driver"
+      JWT_SECRET: 4D28746E386459E4A3C5C341A1BC7D28746E386459E4A3C5C341A1BC7D2874
+      JDBC_DB: mysql
+    networks:
+      - spring-mysql-net
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:5.7
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mantick_db
+    networks:
+      - spring-mysql-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=${DB_USER}", "--password=${DB_PASSWORD}"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+    
+networks:
+  spring-mysql-net:
+    driver: bridge
