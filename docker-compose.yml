@@ -1,4 +1,3 @@
-version: "3"
 services:
   mantick-app:
     container_name: mantick_app
