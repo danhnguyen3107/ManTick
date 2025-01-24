@@ -10,13 +10,13 @@ function start_app() {
     fi
 
     echo "Starting Docker Compose services..."
-    docker compose -f ./docker-compose.yml up
+    sudo docker compose -f ./docker-compose.yml up
 }
 
 # Function to stop and remove Docker Compose services
 function stop_app() {
     echo "Stopping Docker Compose services..."
-    docker compose -f ./docker-compose.yml down
+    sudo docker compose -f ./docker-compose.yml down
 }
 
 # Main menu
