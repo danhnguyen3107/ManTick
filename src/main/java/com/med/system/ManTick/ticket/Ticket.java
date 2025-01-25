@@ -2,8 +2,10 @@
 package com.med.system.ManTick.ticket;
 
 import java.sql.Date;
+import java.util.List;
 
 import com.med.system.ManTick.Users.User;
+import com.med.system.ManTick.comment.entity.Comment;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,10 +18,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,5 +64,8 @@ public class Ticket {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Level level;
+
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Comment> comments;
 
 }

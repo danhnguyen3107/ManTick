@@ -4,16 +4,25 @@ package com.med.system.ManTick.ticket.Controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.med.system.ManTick.Users.User;
+import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
+import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
+import com.med.system.ManTick.comment.Service.CommentService;
+import com.med.system.ManTick.comment.entity.Comment;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.ticket.RequestResponse.AssignTicketRequest;
 import com.med.system.ManTick.ticket.RequestResponse.CloseRequest;
@@ -28,12 +37,32 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TicketController {
 
+
     private final TicketService ticketService;
+
+    private final CommentService commentService;
 
     @GetMapping
     private ResponseEntity<?> getAllTickets() {
-        List<Ticket> tickets = ticketService.getAllTickets();
+        // List<Ticket> tickets = ticketService.getAllTickets();
         
+        // List<TicketResponse> response = tickets.stream().map(this::convertTicketToTicketRequest).toList();
+        // return ResponseEntity.ok(response);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        boolean isAdminOrManager = userDetails.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_MANAGER"));
+
+        List<Ticket> tickets;
+        if (isAdminOrManager) {
+             tickets = ticketService.getAllTickets();
+        } 
+        else {
+            tickets = ticketService.getTicketsByRequesterName(username);
+        }
+
         List<TicketResponse> response = tickets.stream().map(this::convertTicketToTicketRequest).toList();
         return ResponseEntity.ok(response);
         
@@ -46,13 +75,23 @@ public class TicketController {
 
         if (!validateTicketRequest(ticketRequest)) return ResponseEntity.badRequest().body("Invalid ticket request");
         
+
         Ticket ticket = ticketService.createTicket(ticketRequest);
 
+        CommentRequest commentRequest = CommentRequest.builder()
+                                    .ticketId(ticket.getId().longValue())
+                                    .subject(ticket.getSubject())
+                                    .message(ticket.getDescription())
+                                    .fromUser(authentication.getName())
+                                    .toUser("admin@gmail.com")
+                                    .build();
+        commentService.sendMessage(commentRequest);
 
         return ResponseEntity.ok(convertTicketToTicketRequest(ticket));
     }
 
-    @PostMapping("/assignTicket")
+    @PutMapping("/assignTicket")
+    // @PreAuthorize("hasAuthority('admin:update') or hasAuthority('management:update')")
     private ResponseEntity<?> assignTicket(@RequestBody AssignTicketRequest assignTicketRequest) {
 
         // Validate the ticket request fields
@@ -62,11 +101,32 @@ public class TicketController {
         return ResponseEntity.ok(convertTicketToTicketRequest(ticket));
        
     }
-    @PostMapping("/closeTicket")
+    @PutMapping("/closeTicket")
+    // @PreAuthorize("hasAuthority('admin:update') or hasAuthority('management:update')")
     private ResponseEntity<?> closeTicket(@RequestBody CloseRequest closeRequest) {
         Ticket ticket = ticketService.closeTicket(closeRequest);
         return ResponseEntity.ok(convertTicketToTicketRequest(ticket));
     }
+
+    @GetMapping("/{ticketId}")
+    private ResponseEntity<?> getAllComment(@PathVariable long ticketId) {
+        List<Comment> comments = commentService.getAllCommentsByTicketID(ticketId);
+
+        List<CommentResponse> response = comments.stream()
+            .map(CommentResponse::convertToCommentResponse)
+            .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
+
+
+
+
 
     private boolean validateAssignTicketRequest(AssignTicketRequest assignTicketRequest) {
         // Validate the ticket request fields

@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.med.system.ManTick.comment.entity.Comment;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.token.Token;
 
@@ -14,6 +15,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,6 +51,12 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "requesterName")
     private List<Ticket> tickets;
+
+    @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+    private List<Comment> fromComments;
+
+    @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+    private List<Comment> toComments;
 
     @OneToOne(mappedBy = "technician")
     private Ticket assignTicket;

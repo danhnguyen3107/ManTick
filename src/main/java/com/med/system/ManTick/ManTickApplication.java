@@ -41,6 +41,15 @@ public class ManTickApplication {
 					.build();
 			System.out.println("Manager token: " + service.register(manager).getAccessToken());
 
+			var user = RegisterRequest.builder()
+					.firstname("user")
+					.lastname("user")
+					.email("user@gmail.com")
+					.password("password")
+					.role(USER)
+					.build();
+			System.out.println("Manager token: " + service.register(user).getAccessToken());
+
 		};
 	}
 }

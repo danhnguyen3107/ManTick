@@ -3,6 +3,7 @@ package com.med.system.ManTick.ticket.Services;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,13 @@ public class TicketService {
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
     }
+    public List<Ticket> getTicketsByRequesterName(String requesterName) {
+        return ticketRepository.findByRequesterName(requesterName);
+    }
+
+    public Optional<Ticket> findById(Long ticketId) {
+        return ticketRepository.findById(ticketId);
+    }
     public Ticket createTicket(TicketRequest request) {
         // Validate and fetch the requester
         User requester = userRepository.findByEmail(request.getRequesterName())
@@ -50,8 +58,8 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
     public Ticket assignTicket(AssignTicketRequest assignTicketRequest) {
-        // Validate and fetch the ticket
 
+        // Validate and fetch the ticket
         Ticket ticket = ticketRepository.findById(assignTicketRequest.getTicketId().longValue())
                     .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
 
