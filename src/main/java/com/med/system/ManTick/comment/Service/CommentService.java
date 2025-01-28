@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.comment.Repository.CommentRepository;
@@ -33,6 +34,8 @@ public class CommentService {
     public List<Comment> getAllCommentsByTicketID(long ticketId){
         return commentRepository.findByTicketId(ticketId);
     }
+
+    @Transactional
     public Comment sendMessage(CommentRequest commentRequest){
 
         String subject = commentRequest.getSubject();

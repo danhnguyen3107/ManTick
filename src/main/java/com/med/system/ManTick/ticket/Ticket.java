@@ -4,6 +4,8 @@ package com.med.system.ManTick.ticket;
 import java.sql.Date;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.comment.entity.Comment;
 
@@ -65,7 +67,7 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private Level level;
 
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments;
 
 }

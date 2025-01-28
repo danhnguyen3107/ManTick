@@ -92,4 +92,18 @@ public class AdminController {
                 .role(user.getRole()) 
                 .build();
     }
+
+
+    @DeleteMapping("/deleteUser")
+    @PreAuthorize("hasAuthority('admin:delete')")
+    public ResponseEntity<?> deleteUser(@RequestBody User user) {
+        boolean isDeleteUser = adminService.deleteUserById(user.getId());
+       
+        if (!isDeleteUser) 
+            return ResponseEntity.badRequest().body("Cannot delete user");
+
+        return ResponseEntity.ok("Seccessfully delete user");
+    }
+
+
 }

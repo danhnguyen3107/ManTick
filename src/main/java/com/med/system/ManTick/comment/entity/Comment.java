@@ -4,6 +4,10 @@ package com.med.system.ManTick.comment.entity;
 
 import java.sql.Date;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.ticket.Ticket;
 
@@ -41,6 +45,7 @@ public class Comment {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Ticket ticket;
 
     
@@ -53,6 +58,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private User toUser;
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.Users.UserRepository;
@@ -37,6 +38,8 @@ public class TicketService {
     public Optional<Ticket> findById(Long ticketId) {
         return ticketRepository.findById(ticketId);
     }
+
+    @Transactional
     public Ticket createTicket(TicketRequest request) {
         // Validate and fetch the requester
         User requester = userRepository.findByEmail(request.getRequesterName())
@@ -57,6 +60,8 @@ public class TicketService {
 
         return ticketRepository.save(ticket);
     }
+
+    @Transactional
     public Ticket assignTicket(AssignTicketRequest assignTicketRequest) {
 
         // Validate and fetch the ticket
@@ -76,6 +81,8 @@ public class TicketService {
 
         
     }
+
+    @Transactional
     public Ticket closeTicket(CloseRequest ticketId) {
         
         Ticket ticket = ticketRepository.findById(ticketId.getTicketId().longValue())

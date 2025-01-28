@@ -46,16 +46,16 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> tokens;
 
-    @OneToMany(mappedBy = "requesterName")
+    @OneToMany(mappedBy = "requesterName", fetch = FetchType.LAZY)
     private List<Ticket> tickets;
 
-    @OneToMany(mappedBy = "fromUser", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fromUser",  fetch = FetchType.LAZY)
     private List<Comment> fromComments;
 
-    @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "toUser",  fetch = FetchType.LAZY)
     private List<Comment> toComments;
 
     @OneToOne(mappedBy = "technician")

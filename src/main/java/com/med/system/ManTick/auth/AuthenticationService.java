@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.med.system.ManTick.JWT.JwtService;
@@ -35,6 +36,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         User user = User.builder()
             .firstname(request.getFirstname())
@@ -65,6 +67,7 @@ public class AuthenticationService {
     }
 
 
+    @Transactional
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
@@ -91,6 +94,7 @@ public class AuthenticationService {
     }
 
 
+    @Transactional
     private void revokeAllUserTokens(User user) {
         List<Token> validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty()) return;
@@ -102,6 +106,7 @@ public class AuthenticationService {
     }
 
 
+    @Transactional
     private void saveUserToken( User user, String jwtToken) {
         Token token = Token.builder()
             .user(user)
@@ -115,32 +120,33 @@ public class AuthenticationService {
     }
 
 
-  public void refreshToken(
-          HttpServletRequest request,
-          HttpServletResponse response
-  ) throws IOException {
-    final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    final String refreshToken;
-    final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-      return;
-    }
-    refreshToken = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(refreshToken);
-    if (userEmail != null) {
-      var user = this.repository.findByEmail(userEmail)
-              .orElseThrow();
-      if (jwtService.isTokenValid(refreshToken, user)) {
-        var accessToken = jwtService.generateToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, accessToken);
-        var authResponse = AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-        new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+    @Transactional
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+      final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+      final String refreshToken;
+      final String userEmail;
+      if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        return;
+      }
+      refreshToken = authHeader.substring(7);
+      userEmail = jwtService.extractUsername(refreshToken);
+      if (userEmail != null) {
+        var user = this.repository.findByEmail(userEmail)
+                .orElseThrow();
+        if (jwtService.isTokenValid(refreshToken, user)) {
+          var accessToken = jwtService.generateToken(user);
+          revokeAllUserTokens(user);
+          saveUserToken(user, accessToken);
+          var authResponse = AuthenticationResponse.builder()
+                  .accessToken(accessToken)
+                  .refreshToken(refreshToken)
+                  .build();
+          new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+        }
       }
     }
-  }
 
 }
