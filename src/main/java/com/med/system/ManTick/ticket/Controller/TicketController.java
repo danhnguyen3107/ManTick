@@ -3,8 +3,6 @@
 package com.med.system.ManTick.ticket.Controller;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -18,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.med.system.ManTick.Users.User;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
 import com.med.system.ManTick.comment.Service.CommentService;
@@ -29,7 +29,6 @@ import com.med.system.ManTick.ticket.RequestResponse.CloseRequest;
 import com.med.system.ManTick.ticket.RequestResponse.TicketRequest;
 import com.med.system.ManTick.ticket.RequestResponse.TicketResponse;
 import com.med.system.ManTick.ticket.Services.TicketService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -120,11 +119,19 @@ public class TicketController {
     }
 
 
+    @GetMapping("/search")
+    // @PreAuthorize("hasAuthority('admin:read')")
+    public List<TicketResponse> searchTickets(@RequestBody SearchRequest request) {
 
+        List<Ticket> tickets = ticketService.searchTicketsBySubject(request.getRequest());
 
+        List<TicketResponse> response = tickets.stream()
+            .map(this::convertTicketToTicketRequest)
+            .toList();
 
+        return response;
 
-
+    }
 
 
 

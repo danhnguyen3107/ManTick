@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.comment.entity.Comment;
-import com.med.system.ManTick.ticket.Ticket;
+
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long>  {

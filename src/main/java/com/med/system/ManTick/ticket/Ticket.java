@@ -3,12 +3,8 @@ package com.med.system.ManTick.ticket;
 
 import java.sql.Date;
 import java.util.List;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.comment.entity.Comment;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

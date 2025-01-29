@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.med.system.ManTick.JWT.JwtService;
-import com.med.system.ManTick.Users.Role;
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.Users.UserRepository;
 import com.med.system.ManTick.token.Token;
@@ -56,7 +55,7 @@ public class AuthenticationService {
           .success(false)
           .build();
         }
-        User saveUser = repository.save(user);
+        repository.save(user);
 
         return AuthenticationResponse.builder()
             .accessToken("jwtToken")

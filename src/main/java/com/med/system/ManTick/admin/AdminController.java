@@ -1,12 +1,11 @@
 
 package com.med.system.ManTick.admin;
 
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.Users.RequestResponse.UserResponse;
+import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
 import com.med.system.ManTick.admin.services.AdminService;
 import com.med.system.ManTick.auth.AuthenticationResponse;
 import com.med.system.ManTick.auth.AuthenticationService;
@@ -105,5 +105,25 @@ public class AdminController {
         return ResponseEntity.ok("Seccessfully delete user");
     }
 
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('admin:read')")
+    public List<UserResponse> searchUsers(@RequestBody SearchRequest request) {
+       
+        System.out.println("Request String: " + request.getRequest());
+        List<User> users = adminService.searchUsers(request.getRequest());
 
+        List<UserResponse> userResponses = users.stream()
+            .map(user -> UserResponse.builder()
+                .id(user.getId().intValue())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build())
+            .collect(Collectors.toList());
+
+        return userResponses;
+    
+       
+    }
 }

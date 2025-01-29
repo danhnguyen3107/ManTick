@@ -4,10 +4,8 @@ package com.med.system.ManTick.ticket.Services;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.Users.UserRepository;
 import com.med.system.ManTick.ticket.Level;
@@ -17,9 +15,7 @@ import com.med.system.ManTick.ticket.Repository.TicketRepository;
 import com.med.system.ManTick.ticket.RequestResponse.AssignTicketRequest;
 import com.med.system.ManTick.ticket.RequestResponse.CloseRequest;
 import com.med.system.ManTick.ticket.RequestResponse.TicketRequest;
-
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -93,5 +89,9 @@ public class TicketService {
 
         return ticketRepository.save(ticket);
         
+    }
+
+    public List<Ticket> searchTicketsBySubject(String subject) {
+        return ticketRepository.findBySubject(subject);
     }
 }

@@ -22,7 +22,7 @@ public class ManTickApplication {
 	public CommandLineRunner commandLineRunner(
 			AuthenticationService service
 	) {
-		return args -> {
+		return _ -> {
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
 					.lastname("Admin")

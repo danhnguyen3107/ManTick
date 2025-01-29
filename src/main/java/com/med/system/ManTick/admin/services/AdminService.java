@@ -1,11 +1,12 @@
 
 package com.med.system.ManTick.admin.services;
 
-import java.util.ArrayList;
+
+
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,4 +69,26 @@ public class AdminService {
         adminRepository.delete(user);
         return true;
     }
+
+
+    
+
+    public List<User> searchUserByEmail(String email) {
+        return adminRepository.findByEmail(email);
+    }
+
+    public List<User> searchUsersByFirstname(String firstname) {
+        return adminRepository.findByFirstnameContainingIgnoreCase(firstname);
+    }
+
+    public List<User> searchUsersByLastname(String lastname) {
+        return adminRepository.findByLastnameContainingIgnoreCase(lastname);
+    }
+
+    public List<User> searchUsers(String request){
+  
+
+        return adminRepository.findByUnknowCategory(request);
+    }
+
 }

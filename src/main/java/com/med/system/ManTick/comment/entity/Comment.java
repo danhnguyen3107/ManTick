@@ -3,18 +3,12 @@
 package com.med.system.ManTick.comment.entity;
 
 import java.sql.Date;
-
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.ticket.Ticket;
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,5 +1,3 @@
-
-
 package com.med.system.ManTick.ticket.Repository;
 
 import java.util.List;
@@ -22,4 +20,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
     @Modifying
     @Query("UPDATE Ticket t SET t.requesterName = :trailingUser WHERE t.requesterName = :user")
     void updateTicketsByRequesterName(@Param("user") User user, @Param("trailingUser") User trailingUser);
+
+    @Query("SELECT t FROM Ticket t WHERE LOWER(t.subject) LIKE LOWER(CONCAT('%', :subject, '%'))")
+    List<Ticket> findBySubject(@Param("subject") String subject);
 }
