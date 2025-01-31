@@ -94,4 +94,17 @@ public class TicketService {
     public List<Ticket> searchTicketsBySubject(String subject) {
         return ticketRepository.findBySubject(subject);
     }
+
+    public List<Ticket> searchTicketsBySubjectAndEmail(String subject, String requesterName) {
+        return ticketRepository.findBySubjectAndRequesterName(subject, requesterName);
+    }
+
+
+    public List<Ticket> findByStatus(Status status) {
+        return ticketRepository.findByStatus(status);
+    }
+    
+    public List<Ticket> findByRequesterAndStatus(String requesterName, Status status) {
+        return ticketRepository.findByRequesterNameAndStatus(requesterName, status);
+    }
 }

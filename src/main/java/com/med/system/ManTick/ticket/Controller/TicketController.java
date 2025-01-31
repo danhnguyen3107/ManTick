@@ -2,6 +2,7 @@
 
 package com.med.system.ManTick.ticket.Controller;
 
+
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -21,6 +23,7 @@ import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
 import com.med.system.ManTick.comment.Service.CommentService;
 import com.med.system.ManTick.comment.entity.Comment;
+import com.med.system.ManTick.ticket.Status;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.ticket.RequestResponse.AssignTicketRequest;
 import com.med.system.ManTick.ticket.RequestResponse.CloseRequest;
@@ -40,24 +43,32 @@ public class TicketController {
     private final CommentService commentService;
 
     @GetMapping
-    private ResponseEntity<?> getAllTickets() {
-        // List<Ticket> tickets = ticketService.getAllTickets();
-        
-        // List<TicketResponse> response = tickets.stream().map(this::convertTicketToTicketRequest).toList();
-        // return ResponseEntity.ok(response);
+    private ResponseEntity<?> getAllTickets(@RequestParam(value = "status", required = false) String statusStr) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
-        boolean isAdminOrManager = userDetails.getAuthorities().stream()
-            .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_MANAGER"));
+        boolean isAdminOrManager = this.isAdmin();
+        
 
+        Status status = null;
+
+        // Convert status string to enum
+        if (statusStr != null) {
+            try {
+                status = Status.valueOf(statusStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body("Invalid status: " + statusStr);
+            }
+        }
+    
         List<Ticket> tickets;
+    
         if (isAdminOrManager) {
-             tickets = ticketService.getAllTickets();
-        } 
-        else {
-            tickets = ticketService.getTicketsByRequesterName(username);
+            tickets = (status != null) ? ticketService.findByStatus(status) : ticketService.getAllTickets();
+        } else {
+            tickets = (status != null) ? ticketService.findByRequesterAndStatus(username, status) 
+                                        : ticketService.getTicketsByRequesterName(username);
         }
 
         List<TicketResponse> response = tickets.stream().map(this::convertTicketToTicketRequest).toList();
@@ -120,8 +131,14 @@ public class TicketController {
     @GetMapping("/search")
     // @PreAuthorize("hasAuthority('admin:read')")
     public List<TicketResponse> searchTickets(@RequestBody SearchRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        boolean isAdmin = this.isAdmin();
 
-        List<Ticket> tickets = ticketService.searchTicketsBySubject(request.getRequest());
+
+        List<Ticket> tickets = isAdmin ?  ticketService.searchTicketsBySubject(request.getRequest()) 
+                                        : ticketService.searchTicketsBySubjectAndEmail(request.getRequest(), username);
 
         List<TicketResponse> response = tickets.stream()
             .map(this::convertTicketToTicketRequest)
@@ -132,6 +149,14 @@ public class TicketController {
     }
 
 
+    private boolean isAdmin(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // String username = userDetails.getUsername();
+        return userDetails.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN") || authority.getAuthority().equals("ROLE_MANAGER"));
+ 
+    }
 
     private boolean validateAssignTicketRequest(AssignTicketRequest assignTicketRequest) {
         // Validate the ticket request fields
@@ -177,4 +202,5 @@ public class TicketController {
         // Set other fields as necessary
         return ticketRequest;
     }
+
 }
