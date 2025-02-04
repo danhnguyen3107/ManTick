@@ -59,6 +59,15 @@ public class ManTickApplication {
 					.role(USER)
 					.build();
 			System.out.println("Manager token: " + service.register(trailingUser).getAccessToken());
+
+			var chatAi = RegisterRequest.builder()
+				.firstname("chatAi")
+				.lastname("chatAi")
+				.email("chatAi@gmail.com")
+				.password("password")
+				.role(USER)
+				.build();
+			System.out.println("Manager token: " + service.register(chatAi).getAccessToken());
 		};
 	}
 }

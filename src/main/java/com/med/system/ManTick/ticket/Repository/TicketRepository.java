@@ -34,4 +34,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>{
     
     @Query("SELECT t FROM Ticket t WHERE t.requesterName.email = :requesterName AND t.status = :status")
     List<Ticket> findByRequesterNameAndStatus(@Param("requesterName") String requesterName, @Param("status") Status status);
+
 }

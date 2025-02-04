@@ -79,12 +79,12 @@ public class TicketService {
     }
 
     @Transactional
-    public Ticket closeTicket(CloseRequest ticketId) {
+    public Ticket changeStatus(CloseRequest ticketId, Status status) {
         
         Ticket ticket = ticketRepository.findById(ticketId.getTicketId().longValue())
                 .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
 
-        ticket.setStatus(Status.CLOSED);
+        ticket.setStatus(status);
         ticket.setUpdatedAt(new Date(System.currentTimeMillis()));
 
         return ticketRepository.save(ticket);
