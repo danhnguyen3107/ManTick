@@ -5,8 +5,6 @@ package com.med.system.ManTick.ticket.Controller;
 
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
 import com.med.system.ManTick.chatAI.ChatAIService;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
@@ -37,10 +33,6 @@ import com.med.system.ManTick.ticket.Services.TicketService;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
@@ -107,9 +99,10 @@ public class TicketController {
                                     .build();
         commentService.sendMessage(commentRequest);
 
-
+        // requestChatAI is asynchronous, but it will be called only after sendMessage completes
         chatAiService.requestChatAI(ticket, authentication.getName());
 
+        
         return ResponseEntity.ok(convertTicketToTicketRequest(ticket));
     }
 

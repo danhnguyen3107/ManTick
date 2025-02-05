@@ -12,14 +12,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.Service.CommentService;
 import com.med.system.ManTick.ticket.Ticket;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatAIService {
 
     private final CommentService commentService;
@@ -33,10 +36,11 @@ public class ChatAIService {
     @Value("${application.chatAI.dest}")
     private String chatAi_dest;
 
+
     @Async
     public void requestChatAI(Ticket ticket, String username) {
-
-        String json = "{\"description\": \"" + ticket.getDescription() + "\"}";
+        System.out.println("Requesting Chat AI...");
+        String json = "{\"subject\": \"" + ticket.getSubject() + "\", \"description\": \"" + ticket.getDescription() + "\"}";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://" + chatAi_url + ":" + chatAi_port + "/" + chatAi_dest))
                 .header("Content-Type", "application/json")
@@ -45,14 +49,23 @@ public class ChatAIService {
 
         try {
             var response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            var chatCommentRequest = CommentRequest.builder()
+
+            // Parse the JSON response to extract the "value" field.
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode responseJson = objectMapper.readTree(response.body());
+            String extractedValue = responseJson.path("ai_response").asText();
+
+
+            CommentRequest chatCommentRequest = CommentRequest.builder()
                     .ticketId(ticket.getId().longValue())
                     .subject(ticket.getSubject())
-                    .message(response.body())
+                    .message(extractedValue)
                     .fromUser("chatAi@gmail.com")
                     .toUser(username)
                     .build();
             commentService.sendMessage(chatCommentRequest);
+            System.out.println(extractedValue);
+
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to request chat AI", e);
         }
