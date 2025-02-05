@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
