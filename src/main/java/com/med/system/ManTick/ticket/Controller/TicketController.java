@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
+import com.med.system.ManTick.chatAI.ChatAIService;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
 import com.med.system.ManTick.comment.Service.CommentService;
@@ -50,15 +51,7 @@ public class TicketController {
     private final TicketService ticketService;
 
     private final CommentService commentService;
-
-    @Value("${application.chatAI.url}")
-    private String chatAi_url;
-
-    @Value("${application.chatAI.port}")
-    private String chatAi_port;
-
-    @Value("${application.chatAI.dest}")
-    private String chatAi_dest;
+    private final ChatAIService chatAiService;
 
     @GetMapping
     private ResponseEntity<?> getAllTickets(@RequestParam(value = "status", required = false) String statusStr) {
@@ -114,7 +107,8 @@ public class TicketController {
                                     .build();
         commentService.sendMessage(commentRequest);
 
-        requestChatAI(ticket, authentication.getName());
+
+        chatAiService.requestChatAI(ticket, authentication.getName());
 
         return ResponseEntity.ok(convertTicketToTicketRequest(ticket));
     }
@@ -187,41 +181,6 @@ public class TicketController {
 
     }
 
-    private void requestChatAI(Ticket ticket, String username)  throws IOException, InterruptedException {
-
-       
-        // try {
-        String json = "{\"description\": \"" + ticket.getDescription() + "\"}";
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://" + chatAi_url + ":" + chatAi_port + "/" + chatAi_dest))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-
-
-        CommentRequest chatCommentRequest = CommentRequest.builder()
-                                .ticketId(ticket.getId().longValue())
-                                .subject(ticket.getSubject())
-                                .message(response.body())
-                                .fromUser("chatAi@gmail.com")
-                                .toUser(username)
-                                .build();
-        commentService.sendMessage(chatCommentRequest);
-      
-        // } catch (IOException e) {
-            
-        //     return "Something went wrong";
-
-        // } catch (InterruptedException e) {
-       
-        //     return "Something went wrong";
-
-        // }
-    
-        
-    }
 
     private boolean isAdmin(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
