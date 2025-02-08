@@ -6,10 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.sql.Date;
 import java.util.Set;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +35,6 @@ public class Notification {
     @Column(nullable = false)
     private Date createdAt;
 
-    // @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private Set<UserNotification> userNotifications;
+    @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserAndNotification> userNotifications;
 }

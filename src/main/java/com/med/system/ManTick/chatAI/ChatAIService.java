@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.med.system.ManTick.Notification.Service.NotificationService;
+import com.med.system.ManTick.Users.Role;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.Service.CommentService;
 import com.med.system.ManTick.ticket.Status;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.ticket.Services.TicketService;
 
-
-
+import org.aspectj.weaver.ast.Not;
 import org.slf4j.Logger;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +38,7 @@ public class ChatAIService {
 
     private final CommentService commentService;
     private final TicketService ticketService;
+    private final NotificationService notificationService;
 
     @Value("${application.chatAI.url}")
     private String chatAiUrl;
@@ -107,6 +110,9 @@ public class ChatAIService {
                 commentService.sendMessage(chatCommentRequest);
                 ticketService.changeStatus(commentRequest.getTicketId(), Status.COMPLETED);
                 logger.info("Ticket {} marked as COMPLETED", commentRequest.getTicketId());
+                
+                Set<Role> roles = Set.of(Role.MANAGER, Role.ADMIN);
+                notificationService.sendNotificationToUsersByroles("Ticket " + commentRequest.getTicketId() + " is completed", roles );
             } else {
                 chatCommentRequest.setMessage("You're not the owner of this ticket, so it cannot be automatically completed");
                 commentService.sendMessage(chatCommentRequest);
