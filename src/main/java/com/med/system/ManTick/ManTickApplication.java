@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.med.system.ManTick.Users.User;
+import com.med.system.ManTick.Users.UserRepository;
 import com.med.system.ManTick.auth.AuthenticationService;
 import com.med.system.ManTick.auth.RegisterRequest;
 import static com.med.system.ManTick.Users.Role.*;
@@ -22,7 +24,8 @@ public class ManTickApplication {
 	
 	@Bean
 	public CommandLineRunner commandLineRunner(
-			AuthenticationService service
+			AuthenticationService service,
+			UserRepository repository
 	) {
 		return _ -> {
 			var admin = RegisterRequest.builder()
@@ -70,6 +73,10 @@ public class ManTickApplication {
 				.role(USER)
 				.build();
 			System.out.println("Manager token: " + service.register(chatAi).getAccessToken());
+
+			User chatAiUser = repository.findByEmail("chatAi@gmail.com").orElseThrow( () -> new RuntimeException("User not found"));
+			chatAiUser.setAI(true);
+			repository.save(chatAiUser);
 		};
 	}
 }

@@ -11,6 +11,7 @@ import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.token.Token;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -60,6 +61,8 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "technician")
     private Ticket assignTicket;
 
+    @Column(name = "is_aI", columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isAI;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

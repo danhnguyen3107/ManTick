@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentRequest {
+
     private Long ticketId;
     private String subject;
     private String message;
@@ -35,5 +36,6 @@ public class CommentRequest {
         if (commentRequest.getTicketId() == null || commentRequest.getTicketId()  <= 0) {
             throw new IllegalArgumentException("TicketId must be greater than zero");
         }
+
     }
 }

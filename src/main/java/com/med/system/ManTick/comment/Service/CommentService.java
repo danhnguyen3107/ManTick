@@ -27,6 +27,7 @@ public class CommentService {
     private final TicketService ticketService;
 
 
+
     public List<Comment> getAllComments(){
         return commentRepository.findAll();
     }
@@ -63,7 +64,6 @@ public class CommentService {
         
         return commentRepository.save(comment);
     }
-
 
 
 }

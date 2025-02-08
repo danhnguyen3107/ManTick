@@ -90,7 +90,18 @@ public class TicketService {
         return ticketRepository.save(ticket);
         
     }
+    @Transactional
+    public Ticket changeStatus( long ticketId, Status status) {
+        
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
 
+        ticket.setStatus(status);
+        ticket.setUpdatedAt(new Date(System.currentTimeMillis()));
+
+        return ticketRepository.save(ticket);
+        
+    }
     public List<Ticket> searchTicketsBySubject(String subject) {
         return ticketRepository.findBySubject(subject);
     }
