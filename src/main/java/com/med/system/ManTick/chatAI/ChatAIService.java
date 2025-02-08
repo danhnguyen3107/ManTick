@@ -23,7 +23,7 @@ import com.med.system.ManTick.ticket.Status;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.ticket.Services.TicketService;
 
-import org.aspectj.weaver.ast.Not;
+
 import org.slf4j.Logger;
 import lombok.RequiredArgsConstructor;
 
@@ -110,7 +110,7 @@ public class ChatAIService {
                 commentService.sendMessage(chatCommentRequest);
                 ticketService.changeStatus(commentRequest.getTicketId(), Status.COMPLETED);
                 logger.info("Ticket {} marked as COMPLETED", commentRequest.getTicketId());
-                
+
                 Set<Role> roles = Set.of(Role.MANAGER, Role.ADMIN);
                 notificationService.sendNotificationToUsersByroles("Ticket " + commentRequest.getTicketId() + " is completed", roles );
             } else {
