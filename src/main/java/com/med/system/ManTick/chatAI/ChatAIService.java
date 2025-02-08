@@ -1,5 +1,3 @@
-
-
 package com.med.system.ManTick.chatAI;
 
 import java.io.IOException;

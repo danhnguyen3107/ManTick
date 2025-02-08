@@ -2,10 +2,12 @@ package com.med.system.ManTick.Users;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.med.system.ManTick.Notification.UserNotification;
 import com.med.system.ManTick.comment.entity.Comment;
 import com.med.system.ManTick.ticket.Ticket;
 import com.med.system.ManTick.token.Token;
@@ -61,8 +63,14 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "technician")
     private Ticket assignTicket;
 
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private Set<UserNotification> userNotifications;
+    
+    
     @Column(name = "is_aI", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isAI;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
