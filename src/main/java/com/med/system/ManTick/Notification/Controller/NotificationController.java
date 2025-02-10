@@ -12,7 +12,6 @@ import com.med.system.ManTick.Notification.Notification;
 import com.med.system.ManTick.Notification.RequestResponse.SendNotificationRequest;
 import com.med.system.ManTick.Notification.RequestResponse.SendNotificationRequestByrole;
 import com.med.system.ManTick.Notification.Service.NotificationService;
-import com.med.system.ManTick.Users.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
 
     @PostMapping("/sendNotification")
