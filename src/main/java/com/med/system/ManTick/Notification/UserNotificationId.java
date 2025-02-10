@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Embeddable
 public class UserNotificationId implements Serializable {
-    private Long userId;
+    private Integer userId;
     private Long notificationId;
 }

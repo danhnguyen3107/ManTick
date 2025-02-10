@@ -38,11 +38,11 @@ public class NotificationService  {
         notification = notificationRepository.save(notification);
 
         // For each user ID, create a join entity.
-        for (Long userId : request.getUserIds()) {
-            User user = userRepository.findById(userId.intValue())
+        for (Integer userId : request.getUserIds()) {
+            User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found for id: " + userId));
 
-            UserNotificationId userNotificationId = new UserNotificationId(user.getId().longValue(), notification.getId());
+            UserNotificationId userNotificationId = new UserNotificationId(user.getId(), notification.getId());
             UserAndNotification userNotification = UserAndNotification.builder()
                     .id(userNotificationId)
                     .user(user)
@@ -51,6 +51,9 @@ public class NotificationService  {
                     .build();
 
             userNotificationRepository.save(userNotification);
+
+            // notification.getUserNotifications().add(userNotification);
+         
         }
 
         return notification;
@@ -76,7 +79,7 @@ public class NotificationService  {
 
         // For each user, create a join entity.
         for (User user : users) {
-            UserNotificationId userNotificationId = new UserNotificationId(user.getId().longValue(), notification.getId());
+            UserNotificationId userNotificationId = new UserNotificationId(user.getId(), notification.getId());
             UserAndNotification userNotification = UserAndNotification.builder()
                     .id(userNotificationId)
                     .user(user)

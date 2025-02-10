@@ -35,6 +35,9 @@ public class Notification {
     @Column(nullable = false)
     private Date createdAt;
 
+
     @OneToMany(mappedBy = "notification", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAndNotification> userNotifications;
+
+
 }

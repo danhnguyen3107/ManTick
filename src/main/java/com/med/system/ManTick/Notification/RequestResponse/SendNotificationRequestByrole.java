@@ -1,15 +1,21 @@
 
 package com.med.system.ManTick.Notification.RequestResponse;
 
+
+import java.util.Set;
+import com.med.system.ManTick.Users.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
+
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendNotificationRequest {
+public class SendNotificationRequestByrole {
+
     private String message;
-    private List<Integer> userIds;
+    private Set<Role> roles;
+
 }
