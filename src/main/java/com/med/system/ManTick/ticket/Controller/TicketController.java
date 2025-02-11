@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.med.system.ManTick.admin.RequestResponse.SearchRequest;
 import com.med.system.ManTick.chatAI.ChatAIService;
 import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
@@ -79,7 +82,12 @@ public class TicketController {
         
     }
     @PostMapping
-    private ResponseEntity<?> createTicket(@RequestBody TicketRequest ticketRequest) throws IOException, InterruptedException{
+    private ResponseEntity<?> createTicket(
+        @RequestPart(name ="image", required = false) MultipartFile file,
+        // @RequestBody TicketRequest ticketRequest
+        @RequestPart("ticketRequest") TicketRequest ticketRequest
+        ) throws IOException, InterruptedException{
+        
         // ticketService.createTicket(ticket);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         ticketRequest.setRequesterName(authentication.getName());
@@ -97,7 +105,12 @@ public class TicketController {
                                     .fromUser(authentication.getName())
                                     .toUser("admin@gmail.com")
                                     .build();
-        commentService.sendMessage(commentRequest);
+        if (file != null && !file.isEmpty()) {
+            commentService.sendMessage(commentRequest, file);
+        }
+        else {
+            commentService.sendMessage(commentRequest);
+        }
 
         // requestChatAI is asynchronous, but it will be called only after sendMessage completes
         chatAiService.requestChatAI(ticket, authentication.getName());

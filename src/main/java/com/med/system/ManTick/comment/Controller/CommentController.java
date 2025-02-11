@@ -4,9 +4,11 @@ package com.med.system.ManTick.comment.Controller;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.med.system.ManTick.Users.User;
 import com.med.system.ManTick.Users.UserRepository;
 import com.med.system.ManTick.chatAI.ChatAIService;
@@ -14,6 +16,9 @@ import com.med.system.ManTick.comment.RequestResponse.CommentRequest;
 import com.med.system.ManTick.comment.RequestResponse.CommentResponse;
 import com.med.system.ManTick.comment.Service.CommentService;
 import com.med.system.ManTick.comment.entity.Comment;
+
+import java.io.IOException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,9 +36,10 @@ class CommentController {
 
     @PostMapping("/{ticketId}")
     public ResponseEntity<CommentResponse> sendComment(
-        @RequestBody CommentRequest request,
+        @RequestPart(name ="image", required = false) MultipartFile file,
+        @RequestPart("commentRequest") CommentRequest request,
         @PathVariable long ticketId
-        ){
+        ) throws IOException{
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -41,7 +47,7 @@ class CommentController {
         request.setTicketId(ticketId);
         CommentRequest.validateCommentRequest(request);
         
-        Comment comment =  commentService.sendMessage(request);
+        Comment comment = file != null && !file.isEmpty() ? commentService.sendMessage(request, file) : commentService.sendMessage(request);
 
         CommentResponse commentResponse = CommentResponse.convertToCommentResponse(comment);
 

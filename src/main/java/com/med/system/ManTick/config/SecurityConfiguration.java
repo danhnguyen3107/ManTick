@@ -40,6 +40,7 @@ public class SecurityConfiguration {
                                 .permitAll()
                                 .requestMatchers("/api/v1/auth/register").hasAnyRole(ADMIN.name())
                                 .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
+                                .requestMatchers("/api/v1/image/**").hasAnyRole(ADMIN.name(), MANAGER.name(), USER.name())
                                 .requestMatchers("/api/v1/ticket").hasAnyRole(ADMIN.name(), MANAGER.name(), USER.name())
                                 
                                 .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())

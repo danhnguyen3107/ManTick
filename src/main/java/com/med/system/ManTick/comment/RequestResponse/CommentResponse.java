@@ -2,11 +2,13 @@
 
 package com.med.system.ManTick.comment.RequestResponse;
 
+
 import com.med.system.ManTick.comment.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @Data
 @Builder
