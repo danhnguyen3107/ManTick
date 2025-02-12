@@ -4,9 +4,12 @@ Ticket Management system for IT
 ## Run Code
 
 ```
-mvn package
+./manage_app.sh
 ```
+Choose option `1` for running code
 
+## Stop Code
 ```
-docker compose up
+./manage_app.sh
 ```
+Choose option `2` for stopping code
