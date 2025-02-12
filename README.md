@@ -12,4 +12,4 @@ Choose option `1` for running code
 ```
 ./manage_app.sh
 ```
-Choose option `2` for stopping code
+Choose option `2` to stop code
