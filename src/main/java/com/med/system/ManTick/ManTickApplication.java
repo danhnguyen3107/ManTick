@@ -27,7 +27,7 @@ public class ManTickApplication {
 			AuthenticationService service,
 			UserRepository repository
 	) {
-		return _ -> {
+		return args -> {
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")
 					.lastname("Admin")
