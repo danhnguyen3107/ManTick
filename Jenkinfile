@@ -5,40 +5,99 @@ pipeline {
 //         args '-v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
        
 //     }
-      agent {
-        docker {
-          image 'dinhdanhnguyen/docker-java-maven-fedora:latest'
-          args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+    agent {
+      docker {
+        image 'dinhdanhnguyen/docker-java-maven-fedora:latest'
+        args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+      }
+    }
+
+
+
+
+
+
+    stages {
+      stage('Pull And Maven Build') {
+          steps {
+              // Get some code from a GitHub repository
+              // git branch: 'main', credentialsId: '68d19d0b-74fa-44ae-9442-e502a5f4ab39', url: 'https://github.com/danhnguyen3107/ManTick'
+
+              // Run Maven on a Unix agent.
+              sh "mvn package -DskipTests"
+
+          }
+      }
+      
+      stage('Build and Push Docker Image') {
+        environment {
+          DOCKER_IMAGE = "dinhdanhnguyen/mantick:latest"
+          // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
+          REGISTRY_CREDENTIALS = credentials('docker-hub-credentials')
+        }
+        steps {
+          script {
+              sh 'docker build -t ${DOCKER_IMAGE} .'
+              def dockerImage = docker.image("${DOCKER_IMAGE}")
+              docker.withRegistry('https://index.docker.io/v1/', "docker-hub-credentials") {
+                  dockerImage.push()
+              }
+          }
         }
       }
-    stages {
-        stage('Pull And Maven Build') {
-            steps {
-                // Get some code from a GitHub repository
-                // git branch: 'main', credentialsId: '68d19d0b-74fa-44ae-9442-e502a5f4ab39', url: 'https://github.com/danhnguyen3107/ManTick'
 
-                // Run Maven on a Unix agent.
-                sh "mvn package -DskipTests"
 
-            }
-        }
-        
-        stage('Build and Push Docker Image') {
-          environment {
-            DOCKER_IMAGE = "dinhdanhnguyen/mantick:latest"
-            // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
-            REGISTRY_CREDENTIALS = credentials('docker-hub-credentials')
-          }
+      stage('Checkout') {
           steps {
-            script {
-                sh 'docker build -t ${DOCKER_IMAGE} .'
-                def dockerImage = docker.image("${DOCKER_IMAGE}")
-                docker.withRegistry('https://index.docker.io/v1/', "docker-hub-credentials") {
-                    dockerImage.push()
-                }
-            }
+              // Checkout your repo (credentials must have read & write)
+              checkout([
+                  $class: 'GitSCM',
+                  branches: [[ name: '*/main' ]],
+                  userRemoteConfigs: [[
+                      url: 'https://github.com/danhnguyen3107/ManTick.git',
+                      credentialsId: "${GIT_CREDENTIALS_ID}"
+                  ]]
+              ])
           }
+      }
+
+      stage('Make Changes') {
+          steps {
+              // Example change: append a timestamp to a file
+              sh '''
+                echo "Build ran at $(date)" >> build-timestamps.log
+              '''
+          }
+      }
+
+
+      // Push to git repo
+      stage('Commit & Push') {
+        environment {
+            GIT_TOKEN_ID = 'git-token'
+            GIT_COMMITTER_EMAIL = 'datvsdanh@gmail.com'
+            GIT_USER_NAME   = 'Mark Nguyen',
+            GIT_REPO_NAME   = 'ManTick'
         }
+        steps {
+            withCredentials([string(
+                credentialsId: "${GIT_TOKEN_ID}",
+                variable: 'GITHUB_TOKEN'
+            )]) {
+                sh '''
+                  git config user.email "${GIT_COMMITTER_EMAIL}"
+                  git config user.name  "${GIT_USER_NAME}"
+                  
+                  git add build-timestamps.log
+                  git commit -m "Jenkins: add build timestamp [${BUILD_NUMBER}]"
+                  
+                  # Use HTTPS + credentials to push
+                  git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
+            }
+        }
+      }
+
     }
 }
 
