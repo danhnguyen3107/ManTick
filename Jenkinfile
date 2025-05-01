@@ -70,33 +70,40 @@ pipeline {
           }
       }
 
+      stage("Print directory") {
+          steps {
+              sh 'ls -l'
+          }
+      }
+
 
       // Push to git repo
-      stage('Commit & Push') {
-        environment {
-            GIT_TOKEN_ID = 'git-token'
-            GIT_COMMITTER_EMAIL = 'datvsdanh@gmail.com'
-            GIT_USER_NAME   = 'Mark Nguyen'
-            GIT_REPO_NAME   = 'ManTick'
-        }
-        steps {
-            withCredentials([string(
-                credentialsId: "${GIT_TOKEN_ID}",
-                variable: 'GITHUB_TOKEN'
-            )]) {
-                sh '''
-                  git config user.email "${GIT_COMMITTER_EMAIL}"
-                  git config user.name  "${GIT_USER_NAME}"
+      // stage('Commit & Push') {
+      //   environment {
+      //       GIT_TOKEN_ID = 'git-token'
+      //       GIT_COMMITTER_EMAIL = 'datvsdanh@gmail.com'
+      //       GIT_USER_NAME   = 'Mark Nguyen'
+      //       GIT_REPO_NAME   = 'ManTick'
+      //   }
+      //   steps {
+      //       withCredentials([string(
+      //           credentialsId: "${GIT_TOKEN_ID}",
+      //           variable: 'GITHUB_TOKEN'
+      //       )]) {
+      //           sh '''
                   
-                  git add build-timestamps.log
-                  git commit -m "Jenkins: add build timestamp [${BUILD_NUMBER}]"
+      //             git config user.email "${GIT_COMMITTER_EMAIL}"
+      //             git config user.name  "${GIT_USER_NAME}"
                   
-                  # Use HTTPS + credentials to push
-                  git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
-        }
-      }
+      //             git add build-timestamps.log
+      //             git commit -m "Jenkins: add build timestamp [${BUILD_NUMBER}]"
+                  
+      //             # Use HTTPS + credentials to push
+      //             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+      //           '''
+      //       }
+      //   }
+      // }
 
     }
 }
