@@ -76,7 +76,7 @@ pipeline {
         environment {
             GIT_TOKEN_ID = 'git-token'
             GIT_COMMITTER_EMAIL = 'datvsdanh@gmail.com'
-            GIT_USER_NAME   = 'Mark Nguyen',
+            GIT_USER_NAME   = 'Mark Nguyen'
             GIT_REPO_NAME   = 'ManTick'
         }
         steps {
