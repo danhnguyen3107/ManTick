@@ -15,7 +15,7 @@ pipeline {
         stage('Pull And Maven Build') {
             steps {
                 // Get some code from a GitHub repository
-                git branch: 'main', credentialsId: '68d19d0b-74fa-44ae-9442-e502a5f4ab39', url: 'https://github.com/danhnguyen3107/ManTick'
+                // git branch: 'main', credentialsId: '68d19d0b-74fa-44ae-9442-e502a5f4ab39', url: 'https://github.com/danhnguyen3107/ManTick'
 
                 // Run Maven on a Unix agent.
                 sh "mvn package -DskipTests"
