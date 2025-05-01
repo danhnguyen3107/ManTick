@@ -55,7 +55,7 @@ pipeline {
                   branches: [[ name: '*/main' ]],
                   userRemoteConfigs: [[
                       url: 'https://github.com/danhnguyen3107/ManTick.git',
-                      credentialsId: "${GIT_CREDENTIALS_ID}"
+                      credentialsId: "68d19d0b-74fa-44ae-9442-e502a5f4ab39"
                   ]]
               ])
           }
